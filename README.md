@@ -2,6 +2,12 @@ Got an A
 
 Take inspiration if you like, but try not to copy :)
 
+Data Lab was for practicing bit manipualtion.
+
+Pexex Lab, Smashing Lab, OpenMP Lab are particularly fun.
+
+Their descriptions are in the instructions folder.
+
 
 HW 1:  62
 
