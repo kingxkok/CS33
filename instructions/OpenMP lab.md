@@ -2,7 +2,6 @@
 <!-- saved from url=(0063)http://web.cs.ucla.edu/classes/spring17/cs33/lab/openmplab.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<title>OpenMP lab</title>
 </head>
 
 <body>
