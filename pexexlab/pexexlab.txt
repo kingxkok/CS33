@@ -1,0 +1,68 @@
+/** multiplying trace */
+tried gdb emacs without going to right directory
+and then doing break data.c:1
+but it didn't work because it didnt know where data.c is
+
+worked after
+cd ~eggert/src/emacs-25.2/src/
+and then 
+gdb ./emacs there
+
+was wondering how to input the args if i just did 
+gdb ./emacs
+but then tried (after entering gdb)
+r -Q -batch -eval '(print (* 1250284240 -1844255039))'
+
+quit the debug session
+did 
+set disassemble-next-line on
+break Ftimes
+r -Q -batch -eval '(print (* 1250284240 -1844255039))'
+stepi 	&repeat
+
+info reg [register name]   to check regs   and
+x/g [memory location on stack]
+
+QuickStart (for copy pasting):
+cd ~eggert/src/emacs-25.2/src/
+gdb ./emacs
+set disassemble-next-line on
+break Ftimes
+r -Q -batch -eval '(print (* 1250284240 -1844255039))'
+
+
+
+/** security vulnerability */
+cd ~eggert/src/emacs-25.2/src/
+gdb ./emacs
+set disassemble-next-line on
+b __strcpy_sse2_unaligned   //asked if I wanted to save break for later when
+				//external library files were looked at
+				//(yes)
+r -Q -batch -eval '(print (format-time-string "%Y-%m-%d %H:%M:%S %Z" nil (concat (make-string 1000 ?X) "0")))'
+backtrace
+//to see functions callstack 
+
+tried to run command with 
+make-string 100, 118, 200 
+tried using "" and "1" instead of "0"
+to figure out what was happening
+
+
+/** thinking about how to reduce overhead */
+A lot of the overhead comes from parsing the input
+and finding what operation to use
+the multiplication itself is only a couple of lines
+Elisp storage of integers is also different (it has bits to mark type)
+so that adds commands too
+
+one way to improve is to have special command or mode that just does arithmetic
+so it only needs to check for a small set of cases 
+
+
+
+
+
+
+
+

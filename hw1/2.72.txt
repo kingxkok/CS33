@@ -1,0 +1,2 @@
+A. size_t is unsigned, so it always returns a non-negative value (is always >= 0)
+B. maxbytes-sizeof(val) <= maxbytes

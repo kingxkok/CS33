@@ -1,0 +1,18 @@
+IT DOESN'T WORK IN NESTED FOR LOOP IF YOU DON'T MAKE THE INNER ITERATOR PRIVATE
+(ALSO MAKE OTHER STUFF PRIVATE)
+
+#pragma omp parallel for private(A BUNCH OF STUFF) firstprivate(STUFF THAT HAVE BEEN INITIALISED)
+
+SCHEDULE (since n is always 2^15, we can use static schedule splitting to 2^15/num_threads per thread)
+
+JUST MAKE EVERYTHING PRIVATE (AND FIRSTPRIVATE); this avoid thrashing with multiple cores trying to access the same variable
+Even read only type should be privatised so that each core will have a local copy (possibly stored in register instead of SLOW RAM)
+
+
+don't openmp the inner loops since Ones is only 69 so it's pretty useless, plus there are only 64 logical cores so can't even parallelize beyond 64 (69*2^15 MUCH GREATER than 64). 
+
+did some fun stuff with accumulator (making it a private local variable and then setting it back to the non-temp variable)
+
+
+Tried some SIMD but coz of -O3 it's already mostly vectorised. 
+However, I could try SIMD in different places and it should help; classmate said it helps

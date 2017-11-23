@@ -1,0 +1,8 @@
+12.18
+A. unsafe 
+B. safe
+C. unsafe
+
+12.24
+No. errno is static data; reentrant functions cannot use shared data.
+

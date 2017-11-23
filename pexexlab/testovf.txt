@@ -1,0 +1,21 @@
+-O2
+The expression will only be true if  n+LLONG_MAX  overflows. 
+However, since overflow behavior is undefined, the compiler can do what it wants in order to optimize performance. 
+It chooses to make the result of the boolean expression 0 (false) by doing  xorl %eax %eax
+as that would make the function simply return false all the time (very fast).
+
+-O2 -fwrapv
+We are telling the compiler to handle signed overflow like unsigned overflow
+So, it actually does the addq, which handles overflowing,
+compares, and returns the right value via  setg %al
+
+-O2 -fsanitize=undefined
+used the overflow flag in jo to check; 
+if overflow, calls external function to handle overflow __ubsan_handle_add_overflow,
+and then does what it would do with -fwrapv
+if no overflow, does what it would do with -fwrapv
+
+Makes sense because -fsanitize tells compiler to use
+GCC Undefined Behavior sanitizer, so the compiler
+alerts users if their program could potentially 
+behave undefinedly 

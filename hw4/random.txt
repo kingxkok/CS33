@@ -1,0 +1,22 @@
+A. always 1 since converting int to double preserves precision
+as double as more than 32bits of mantissa 
+(ints only require 32 bits to represent exactly)
+then later converting both to float cuts the precision in the same way
+
+B. not always 1, consider x=INT_MIN, y=1
+requires -fwrapv to not behave undefinedly, but this case should
+never return true with or without wrap, as x-y will never be 
+the mathematically correct value of INT_MIN-1 as there are not enough
+bits in  int  to represent that value
+doubles can represent that value.
+Although, if the compiler tries to be super smart without when it's run 
+without fwrap, and somehow uses the overflow flags to reconstruct 
+the correct value upon converting to double, then *maybe*
+this case could return 1
+
+C. always 1 since x y z can never be close to double's max non-infinity value
+addition with doubles is associative for nice values that ints can represent
+
+D. not always 1, x=2147483647, y=2147483646, z=2147483562
+
+E. not always 1; x=1, z=0

@@ -1,0 +1,21 @@
+Assuming -frwapv
+
+A. INT_MIN<10 but -INT_MIN == INT_MIN so -INT_MIN>-10 is false; true==false yields 0
+B. ((x+y)<<4) + y - x == 17*y+15*x is always true because   
+	<<4 multiplies an int by 16, so +y means y becomes 16*y+y = 17*y, -x means 16*x-x = 15*x.
+C. for some int a, ~a == -a-1, therefore ~(x+y) => -x-y-1 and ~x+~y+1 => -x-1-y-x+1 which == -x-y-1
+	so it's always true. 
+D. the (unsigned) operator is equivalent to +1+INT_MAX. ux-uy == x+1+INT_MAX-y-1-INT_MAX = x-y
+	the -a operator is also equivalent to 
+	-(unsigned)(y-x) == -(y-x+1+INT_MAX) == INT_MAX+1-(y-x+1+INT_MAX+1) == -y+x
+	-y+x==x-y  always true
+E. in twos complement representation, dropping the last two bits to 0s (which is what (x>>2) <<2 does)
+	rounds down the number to the nearest multiple of 4, which always makes a number less than the original
+	so ((x >> 2) << 2) <= x is always true.
+F. x >> 1 == (ux >> 1) + (ux & (-1 << 31))
+	lhs is x/2 rounded down
+	rhs is (x+1+INT_MAX) /2 rounded down +INT_MAX+1 if ux has 1 in MSB
+	x+1+INT_MAX overflows if x+1 is negative, thus subtracting 2*(INT_MAX+1). Dividing by 2 means there is 
+	a missing +INT_MAX+1 so it will require a +INT_MAX+1 after division.
+	rhs doesnt need an additional +INT_MAX+1 if x was initally positive, as  (x+1+INT_MAX) will not overflow.
+G. INT_MAX%128 is not == INT_MAX&127

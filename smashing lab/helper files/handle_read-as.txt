@@ -1,0 +1,592 @@
+.LFE26:
+	.size	finish_connection, .-finish_connection
+	.p2align 4,,15
+	.type	handle_read, @function
+handle_read:
+.LASANPC20:
+.LFB20:
+	.cfi_startproc
+	pushq	%r15
+	.cfi_def_cfa_offset 16
+	.cfi_offset 15, -16
+	pushq	%r14
+	.cfi_def_cfa_offset 24
+	.cfi_offset 14, -24
+	pushq	%r13
+	.cfi_def_cfa_offset 32
+	.cfi_offset 13, -32
+	pushq	%r12
+	.cfi_def_cfa_offset 40
+	.cfi_offset 12, -40
+	pushq	%rbp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 6, -48
+	movq	%rdi, %rbp
+	addq	$8, %rdi
+	pushq	%rbx
+	.cfi_def_cfa_offset 56
+	.cfi_offset 3, -56
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 80
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1175
+	movq	8(%rbp), %rbx
+	leaq	160(%rbx), %r13
+	movq	%r13, %r15
+	shrq	$3, %r15
+	cmpb	$0, 2147450880(%r15)
+	jne	.L1176
+	leaq	152(%rbx), %r14
+	movq	%rsi, %r12
+	movq	160(%rbx), %rsi
+	movq	%r14, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1177
+	movq	152(%rbx), %rdx
+	leaq	144(%rbx), %rcx
+	cmpq	%rdx, %rsi
+	jb	.L1059
+	cmpq	$5000, %rdx
+	jbe	.L1060
+	movl	$httpd_err400form, %eax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1178
+	movl	$httpd_err400title, %eax
+	movq	httpd_err400form(%rip), %r8
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1179
+.L1081:
+	movq	httpd_err400title(%rip), %rdx
+	movl	$.LC47, %r9d
+	movl	$400, %esi
+	movq	%r9, %rcx
+	movq	%rbx, %rdi
+	call	httpd_send_err
+.L1174:
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 56
+	movq	%r12, %rsi
+	movq	%rbp, %rdi
+	popq	%rbx
+	.cfi_def_cfa_offset 48
+	popq	%rbp
+	.cfi_def_cfa_offset 40
+	popq	%r12
+	.cfi_def_cfa_offset 32
+	popq	%r13
+	.cfi_def_cfa_offset 24
+	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
+	.cfi_def_cfa_offset 8
+	jmp	finish_connection
+	.p2align 4,,10
+	.p2align 3
+.L1060:
+	.cfi_restore_state
+	leaq	144(%rbx), %rcx
+	addq	$1000, %rdx
+	movq	%r14, %rsi
+	movq	%rax, 8(%rsp)
+	movq	%rcx, %rdi
+	movq	%rcx, (%rsp)
+	call	httpd_realloc_str
+	movq	8(%rsp), %rax
+	movq	(%rsp), %rcx
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1180
+	cmpb	$0, 2147450880(%r15)
+	movq	152(%rbx), %rdx
+	jne	.L1181
+	movq	160(%rbx), %rsi
+.L1059:
+	movq	%rcx, %rax
+	subq	%rsi, %rdx
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1182
+	leaq	704(%rbx), %r14
+	addq	144(%rbx), %rsi
+	movq	%r14, %rax
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %eax
+	testb	%al, %al
+	je	.L1066
+	cmpb	$3, %al
+	jle	.L1183
+.L1066:
+	movl	704(%rbx), %edi
+	call	read
+	testl	%eax, %eax
+	je	.L1184
+	js	.L1185
+	movq	%r13, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1186
+	cltq
+	addq	%rax, 160(%rbx)
+	movq	%r12, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1187
+	leaq	88(%rbp), %rdi
+	movq	(%r12), %rax
+	movq	%rdi, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1188
+	movq	%rax, 88(%rbp)
+	movq	%rbx, %rdi
+	call	httpd_got_request
+	testl	%eax, %eax
+	je	.L1055
+	cmpl	$2, %eax
+	jne	.L1172
+	movl	$httpd_err400form, %eax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1189
+	movl	$httpd_err400title, %eax
+	movq	httpd_err400form(%rip), %r8
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	je	.L1081
+	movl	$httpd_err400title, %edi
+	call	__asan_report_load8
+	.p2align 4,,10
+	.p2align 3
+.L1185:
+	call	__errno_location
+	movq	%rax, %rdx
+	shrq	$3, %rdx
+	movzbl	2147450880(%rdx), %ecx
+	movq	%rax, %rdx
+	andl	$7, %edx
+	addl	$3, %edx
+	cmpb	%cl, %dl
+	jl	.L1071
+	testb	%cl, %cl
+	jne	.L1190
+.L1071:
+	movl	(%rax), %eax
+	cmpl	$4, %eax
+	jne	.L1191
+.L1055:
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 56
+	popq	%rbx
+	.cfi_def_cfa_offset 48
+	popq	%rbp
+	.cfi_def_cfa_offset 40
+	popq	%r12
+	.cfi_def_cfa_offset 32
+	popq	%r13
+	.cfi_def_cfa_offset 24
+	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L1184:
+	.cfi_restore_state
+	movl	$httpd_err400form, %eax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1192
+	movl	$httpd_err400title, %eax
+	movq	httpd_err400form(%rip), %r8
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	je	.L1081
+	movl	$httpd_err400title, %edi
+	call	__asan_report_load8
+	.p2align 4,,10
+	.p2align 3
+.L1191:
+	cmpl	$11, %eax
+	je	.L1055
+	movl	$httpd_err400form, %eax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1193
+	movl	$httpd_err400title, %eax
+	movq	httpd_err400form(%rip), %r8
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	je	.L1081
+	movl	$httpd_err400title, %edi
+	call	__asan_report_load8
+	.p2align 4,,10
+	.p2align 3
+.L1172:
+	movq	%rbx, %rdi
+	call	httpd_parse_request
+	testl	%eax, %eax
+	js	.L1174
+	movq	%rbp, %rdi
+	call	check_throttles
+	testl	%eax, %eax
+	je	.L1194
+	movq	%r12, %rsi
+	movq	%rbx, %rdi
+	call	httpd_start_request
+	testl	%eax, %eax
+	js	.L1174
+	leaq	528(%rbx), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %eax
+	testb	%al, %al
+	je	.L1088
+	cmpb	$3, %al
+	jle	.L1195
+.L1088:
+	movl	528(%rbx), %eax
+	testl	%eax, %eax
+	je	.L1089
+	leaq	536(%rbx), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1196
+	leaq	136(%rbp), %rdi
+	movq	536(%rbx), %rax
+	movq	%rdi, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1197
+	leaq	544(%rbx), %rdi
+	movq	%rax, 136(%rbp)
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1198
+	leaq	128(%rbp), %rdi
+	movq	544(%rbx), %rax
+	movq	%rdi, %rdx
+	shrq	$3, %rdx
+	addq	$1, %rax
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1199
+.L1098:
+	movq	%rax, 128(%rbp)
+.L1094:
+	leaq	712(%rbx), %rax
+	movq	%rax, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1200
+	cmpq	$0, 712(%rbx)
+	je	.L1201
+	leaq	136(%rbp), %rax
+	movq	%rax, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1202
+	movq	%rdi, %rdx
+	movq	136(%rbp), %rax
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1203
+	cmpq	128(%rbp), %rax
+	jge	.L1174
+	movq	%rbp, %rax
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %eax
+	testb	%al, %al
+	je	.L1112
+	cmpb	$3, %al
+	jle	.L1204
+.L1112:
+	movq	%r12, %rax
+	movl	$2, 0(%rbp)
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1205
+	leaq	80(%rbp), %rdi
+	movq	(%r12), %rax
+	movq	%rdi, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1206
+	leaq	112(%rbp), %rdi
+	movq	%rax, 80(%rbp)
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1207
+	movq	%r14, %rax
+	movq	$0, 112(%rbp)
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %eax
+	testb	%al, %al
+	je	.L1116
+	cmpb	$3, %al
+	jle	.L1208
+.L1116:
+	movl	704(%rbx), %edi
+	call	fdwatch_del_fd
+	movq	%r14, %rax
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %eax
+	testb	%al, %al
+	je	.L1117
+	cmpb	$3, %al
+	jle	.L1209
+.L1117:
+	movl	704(%rbx), %edi
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 56
+	movq	%rbp, %rsi
+	popq	%rbx
+	.cfi_def_cfa_offset 48
+	popq	%rbp
+	.cfi_def_cfa_offset 40
+	popq	%r12
+	.cfi_def_cfa_offset 32
+	popq	%r13
+	.cfi_def_cfa_offset 24
+	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
+	.cfi_def_cfa_offset 8
+	movl	$1, %edx
+	jmp	fdwatch_add_fd
+	.p2align 4,,10
+	.p2align 3
+.L1194:
+	.cfi_restore_state
+	leaq	208(%rbx), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1210
+	movl	$httpd_err503form, %eax
+	movq	208(%rbx), %r9
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1211
+	movl	$httpd_err503title, %eax
+	movq	httpd_err503form(%rip), %r8
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1212
+	movq	httpd_err503title(%rip), %rdx
+	movl	$.LC47, %ecx
+	movl	$503, %esi
+	movq	%rbx, %rdi
+	call	httpd_send_err
+	jmp	.L1174
+.L1183:
+	movq	%r14, %rdi
+	call	__asan_report_load4
+.L1190:
+	movq	%rax, %rdi
+	call	__asan_report_load4
+	.p2align 4,,10
+	.p2align 3
+.L1089:
+	leaq	192(%rbx), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1213
+	movq	192(%rbx), %rax
+	leaq	128(%rbp), %rdi
+	testq	%rax, %rax
+	js	.L1214
+	movq	%rdi, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	je	.L1098
+	call	__asan_report_store8
+	.p2align 4,,10
+	.p2align 3
+.L1201:
+	leaq	56(%rbp), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %eax
+	testb	%al, %al
+	je	.L1101
+	cmpb	$3, %al
+	jle	.L1215
+.L1101:
+	movl	56(%rbp), %eax
+	testl	%eax, %eax
+	jle	.L1216
+	leaq	200(%rbx), %rdi
+	movq	throttles(%rip), %r8
+	movq	%rdi, %rdx
+	shrq	$3, %rdx
+	cmpb	$0, 2147450880(%rdx)
+	jne	.L1217
+	subl	$1, %eax
+	movq	200(%rbx), %rsi
+	leaq	16(%rbp), %rdi
+	leaq	20(%rbp,%rax,4), %r9
+	.p2align 4,,10
+	.p2align 3
+.L1108:
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	movzbl	2147450880(%rax), %edx
+	movq	%rdi, %rax
+	andl	$7, %eax
+	addl	$3, %eax
+	cmpb	%dl, %al
+	jl	.L1106
+	testb	%dl, %dl
+	jne	.L1218
+.L1106:
+	movslq	(%rdi), %rax
+	leaq	(%rax,%rax,2), %rax
+	salq	$4, %rax
+	addq	%r8, %rax
+	leaq	32(%rax), %rdx
+	movq	%rdx, %rcx
+	shrq	$3, %rcx
+	cmpb	$0, 2147450880(%rcx)
+	jne	.L1219
+	addq	$4, %rdi
+	addq	%rsi, 32(%rax)
+	cmpq	%r9, %rdi
+	jne	.L1108
+.L1104:
+	leaq	136(%rbp), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1220
+	movq	%rsi, 136(%rbp)
+	jmp	.L1174
+.L1214:
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1221
+	movq	$0, 128(%rbp)
+	jmp	.L1094
+.L1216:
+	leaq	200(%rbx), %rdi
+	movq	%rdi, %rax
+	shrq	$3, %rax
+	cmpb	$0, 2147450880(%rax)
+	jne	.L1222
+	movq	200(%rbx), %rsi
+	jmp	.L1104
+.L1189:
+	movl	$httpd_err400form, %edi
+	call	__asan_report_load8
+.L1219:
+	movq	%rdx, %rdi
+	call	__asan_report_load8
+.L1217:
+	call	__asan_report_load8
+.L1218:
+	call	__asan_report_load4
+.L1221:
+	call	__asan_report_store8
+.L1202:
+	movq	%rax, %rdi
+	call	__asan_report_load8
+.L1215:
+	call	__asan_report_load4
+.L1222:
+	call	__asan_report_load8
+.L1212:
+	movl	$httpd_err503title, %edi
+	call	__asan_report_load8
+.L1211:
+	movl	$httpd_err503form, %edi
+	call	__asan_report_load8
+.L1210:
+	call	__asan_report_load8
+.L1192:
+	movl	$httpd_err400form, %edi
+	call	__asan_report_load8
+.L1176:
+	movq	%r13, %rdi
+	call	__asan_report_load8
+.L1175:
+	call	__asan_report_load8
+.L1186:
+	movq	%r13, %rdi
+	call	__asan_report_load8
+.L1187:
+	movq	%r12, %rdi
+	call	__asan_report_load8
+.L1180:
+	movq	%r14, %rdi
+	call	__asan_report_load8
+.L1181:
+	movq	%r13, %rdi
+	call	__asan_report_load8
+.L1178:
+	movl	$httpd_err400form, %edi
+	call	__asan_report_load8
+.L1179:
+	movl	$httpd_err400title, %edi
+	call	__asan_report_load8
+.L1182:
+	movq	%rcx, %rdi
+	call	__asan_report_load8
+.L1177:
+	movq	%r14, %rdi
+	call	__asan_report_load8
+.L1188:
+	call	__asan_report_store8
+.L1193:
+	movl	$httpd_err400form, %edi
+	call	__asan_report_load8
+.L1196:
+	call	__asan_report_load8
+.L1195:
+	call	__asan_report_load4
+.L1204:
+	movq	%rbp, %rdi
+	call	__asan_report_store4
+.L1206:
+	call	__asan_report_store8
+.L1205:
+	movq	%r12, %rdi
+	call	__asan_report_load8
+.L1207:
+	call	__asan_report_store8
+.L1209:
+	movq	%r14, %rdi
+	call	__asan_report_load4
+.L1200:
+	movq	%rax, %rdi
+	call	__asan_report_load8
+.L1199:
+	call	__asan_report_store8
+.L1198:
+	call	__asan_report_load8
+.L1197:
+	call	__asan_report_store8
+.L1203:
+	call	__asan_report_load8
+.L1208:
+	movq	%r14, %rdi
+	call	__asan_report_load4
+.L1213:
+	call	__asan_report_load8
+.L1220:
+	call	__asan_report_store8
+	.cfi_endproc
+.LFE20:
+	.size	handle_read, .-handle_read
+	.section	.rodata
+	.align 32
