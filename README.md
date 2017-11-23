@@ -6,7 +6,9 @@ Data Lab was for practicing bit manipualtion.
 
 Pexex Lab, Smashing Lab, OpenMP Lab are particularly fun.
 
-Their descriptions are in the instructions folder.
+Their descriptions are in the [instructions folder]()
+
+Sourced from the course page (may be deprecated): http://web.cs.ucla.edu/classes/spring17/cs33/syllabus.html
 
 
 HW 1:  62
